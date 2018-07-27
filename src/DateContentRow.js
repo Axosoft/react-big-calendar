@@ -176,6 +176,7 @@ class DateContentRow extends React.Component {
       <div className={className}>
         <BackgroundCells
           date={date}
+          events={events}
           getNow={getNow}
           rtl={rtl}
           range={range}
