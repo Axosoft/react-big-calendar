@@ -50,6 +50,8 @@ let propTypes = {
   startAccessor: accessor.isRequired,
   endAccessor: accessor.isRequired,
 
+  handleOnHideOverlay: PropTypes.func,
+
   selected: PropTypes.object,
   selectable: PropTypes.oneOf([true, false, 'ignoreEvents']),
   longPressThreshold: PropTypes.number,
@@ -103,6 +105,8 @@ class MonthView extends React.Component {
     let running
 
     if (this.state.needLimitMeasure) this.measureRowLimit(this.props)
+
+    this.onHideOverlay = this.onHideOverlay.bind(this)
 
     window.addEventListener(
       'resize',
@@ -260,9 +264,13 @@ class MonthView extends React.Component {
     ))
   }
 
+  onHideOverlay() {
+    this.setState({ overlay: null })
+  }
+
   renderOverlay() {
     let overlay = (this.state && this.state.overlay) || {}
-    let { components } = this.props
+    let { components, handleOnHideOverlay } = this.props
 
     const PopupComponent = components.popup || Popup
 
@@ -272,7 +280,14 @@ class MonthView extends React.Component {
         placement="bottom"
         container={this}
         show={!!overlay.position}
-        onHide={() => this.setState({ overlay: null })}
+        onHide={() => {
+          if (handleOnHideOverlay) {
+            return handleOnHideOverlay(this.onHideOverlay)
+          } else {
+            this.onHideOverlay()
+          }
+        }}
+        target={() => overlay.target}
       >
         <PopupComponent
           {...this.props}
